@@ -72,21 +72,40 @@ function App() {
     setPlaylistName(e.target.value);
   };
 
+  const openWhichList = () => {
+    //Shows options of where to add a song
+    
+  }
+
+  const checkPlaylist = (e) => {
+    //Adds a song to the playlist
+    e.preventDefault();
+    openWhichList();
+    setPlaylistItems((prev) => [...prev, e.target.innerText]);
+    console.log(playlistItems);
+  }
+
   const [playlistOpen, setPlaylistOpen] = useState(false);
 
   const openPlaylist = (e) => {
     //Opens the playlist
     e.preventDefault();
+    playlistLists.find((playlist) => {
+      if (playlist.name === e.target.innerText) {
+        setOpenPlayList(playlist);
+      }
+    })
     setPlaylistOpen(!playlistOpen);
   }
 
   console.log(playlistLists);
 
   const [playlistItems, setPlaylistItems] = useState([]);
+  const [openPlayList, setOpenPlayList] = useState(null);
   if(playlistOpen) {
     return (
       <div className="App">
-        <OpenPlaylist />
+        <OpenPlaylist playlist={openPlayList}/>
       </div>
     )
   }
@@ -108,7 +127,7 @@ function App() {
         }}
       >
         {tracks.map((track) => (
-          <Track track={track} />
+          <Track track={track} checkPlaylist={checkPlaylist}/>
         ))}
       </div>
       <div style={{ display: "flex", flexDirection: "column", width: "30%" }}>
