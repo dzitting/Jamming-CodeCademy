@@ -74,7 +74,7 @@ function App() {
 
   const openWhichList = () => {
     //Shows options of where to add a song
-    
+
   }
 
   const checkPlaylist = (e) => {
@@ -124,13 +124,14 @@ function App() {
           justifyContent: "space-between",
           width: "70%",
           float: "right",
+          margin: "0 50px",
         }}
       >
         {tracks.map((track) => (
           <Track track={track} checkPlaylist={checkPlaylist}/>
         ))}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", width: "30%" }}>
+      <div style={{ display: "flex", flexDirection: "column", width: "20%" }}>
         {isCreating ? (
           <CreateAPlaylist
             playlist={playlistName}
