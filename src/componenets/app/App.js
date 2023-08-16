@@ -14,6 +14,7 @@ function App() {
     { name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
     { name: "Alone", artist: "Samus", album: "My Word", id: 2 },
     { name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
+    { name: "Make Me", artist: "Sall", album: "Lil", id: 4 },
   ];
 
   useEffect(() => {
@@ -72,10 +73,11 @@ function App() {
     setPlaylistName(e.target.value);
   };
 
+  const [isAdding, setIsAdding] = useState(false);
   const openWhichList = () => {
     //Shows options of where to add a song
-
-  }
+    setIsAdding(!isAdding);
+  };
 
   const checkPlaylist = (e) => {
     //Adds a song to the playlist
@@ -83,7 +85,7 @@ function App() {
     openWhichList();
     setPlaylistItems((prev) => [...prev, e.target.innerText]);
     console.log(playlistItems);
-  }
+  };
 
   const [playlistOpen, setPlaylistOpen] = useState(false);
 
@@ -94,20 +96,20 @@ function App() {
       if (playlist.name === e.target.innerText) {
         setOpenPlayList(playlist);
       }
-    })
+    });
     setPlaylistOpen(!playlistOpen);
-  }
+  };
 
   console.log(playlistLists);
 
   const [playlistItems, setPlaylistItems] = useState([]);
   const [openPlayList, setOpenPlayList] = useState(null);
-  if(playlistOpen) {
+  if (playlistOpen) {
     return (
       <div className="App">
-        <OpenPlaylist playlist={openPlayList}/>
+        <OpenPlaylist playlist={openPlayList} />
       </div>
-    )
+    );
   }
   return (
     //Returns the components into the render
@@ -121,14 +123,16 @@ function App() {
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: "flex-start",
+          flexFlow: "row-wrap",
           width: "70%",
           float: "right",
           margin: "0 50px",
+          flexWrap: "wrap",
         }}
       >
         {tracks.map((track) => (
-          <Track track={track} checkPlaylist={checkPlaylist}/>
+          <Track track={track} checkPlaylist={checkPlaylist} isAdding={isAdding} list={playlistLists} />
         ))}
       </div>
       <div style={{ display: "flex", flexDirection: "column", width: "20%" }}>
