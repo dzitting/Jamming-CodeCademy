@@ -1,19 +1,24 @@
 import React from 'react';
 
 const OpenPlaylist = (props) => {
+    if (!props) {
+      // Playlist data is not yet available, show loading state
+      return <p>Loading...</p>;
+    }
+  
     return (
-        <>
-            <h1>{props.playlist.name}</h1>
-            {props.playlist.items.length < 1 ? (
-                <p>There are no songs in this playlist</p>
-            ) : (
-                props.playlist.items.map((track, key) => (
-                    <h1 key={key} >{track.name}</h1>
-                ))
-            )}
-            <button onClick={props.open}>Back</button>
-        </>
+      <>
+        <h1>{props.playlist.name}</h1>
+        {props.playlist.items.length < 1 ? (
+          <p>There are no songs in this playlist</p>
+        ) : (
+          props.playlist.items.map((track) => (
+            <p>{track.name} by {track.artist} from {track.album}</p>
+          ))
+        )}
+        <button onClick={props.open}>Back</button>
+      </>
     );
-};
-
+  };
+  
 export default OpenPlaylist;

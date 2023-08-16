@@ -8,13 +8,13 @@ import OpenPlaylist from "../openplaylist/OpenPlaylist";
 
 function App() {
   const [tracks, setTracks] = useState([]); //state for saving tracks
-  const [playlistName, setPlaylistName] = useState("");
+  const [playlistName, setPlaylistName] = useState(""); //Used to move into playlistLists.name and later add items into the list
   const data = [
     //Temp data for API call
-    { name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
-    { name: "Alone", artist: "Samus", album: "My Word", id: 2 },
-    { name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
-    { name: "Make Me", artist: "Sall", album: "Lil", id: 4 },
+    {name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
+    {name: "Alone", artist: "Samus", album: "My Word", id: 2 },
+    {name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
+    {name: "Make Me", artist: "Sall", album: "Lil", id: 4 },
   ];
 
   useEffect(() => {
@@ -36,14 +36,13 @@ function App() {
   };
 
   const filterTracks = (query) => {
-    //Uses the query to filter items with that search term
     const searchName = data.filter((track) => {
-      if (
-        track.name.toLowerCase().includes(query.toLowerCase()) ||
-        track.artist.toLowerCase().includes(query.toLowerCase()) ||
-        track.album.toLowerCase().includes(query.toLowerCase())
-      )
-        return track;
+      const lowerCaseQuery = query.toLowerCase();
+      return (
+        track.name.toLowerCase().includes(lowerCaseQuery) ||
+        track.artist.toLowerCase().includes(lowerCaseQuery) ||
+        track.album.toLowerCase().includes(lowerCaseQuery)
+      );
     });
     setTracks(searchName);
   };
@@ -57,10 +56,14 @@ function App() {
       ...prev,
       {
         name: playlistName,
-        items: playlistItems,
-      },
+        items: [],
+      }
     ]);
   };
+  //When creating, allows back button to toggle isCreating
+  const toggleCreating = () => {
+    setIsCreating(!isCreating);
+  }
   const createPlaylist = () => {
     //Creates a new playlist
     setPlaylistName(null);
@@ -74,36 +77,56 @@ function App() {
   };
 
   const [isAdding, setIsAdding] = useState(false);
+  const [showPosition, setShowPosition] = useState(null);
+  const [toAdd, setToAdd] = useState(null);
+  let rect = {};
 
-  const checkPlaylist = (e) => {
+  const checkPlaylist = async (e, parentId) => {
     //Adds a song to the playlist
     e.preventDefault();
+    await setToAdd(parentId);
+    rect = e.target.getBoundingClientRect();
     setIsAdding(!isAdding);
-    setPlaylistItems((prev) => [...prev, e.target.innerText]);
-    console.log(playlistItems);
+    setShowPosition({
+      position: "absolute",
+      top: rect.top,
+      left: rect.left,
+      marginTop: 10,
+      cursor: "pointer",
+    });
+  };
+
+  const handlePlaylistChoice = async (e) => {
+    //Handles the playlist choice made when the user clicks 'Add to Playlist'
+    e.preventDefault();
+    await setPlaylistName(e.target.innerText);
+    let addTrack = await data.find((item) => {
+      let search = parseInt(toAdd.substring(6));
+      if (item.id === search) {
+        return item;
+      }
+    })
+    const editPlaylist = playlistLists.find((playlist) => playlist.name === e.target.innerText);
+
+    editPlaylist.items.push(addTrack);
+    setIsAdding(!isAdding);
   };
 
   const [playlistOpen, setPlaylistOpen] = useState(false);
+  const [openPlayList, setOpenPlayList] = useState({});
 
-  const openPlaylist = (e) => {
-    //Opens the playlist
+  //Opens the playlist
+  const findToOpen = async (e) => {
     e.preventDefault();
-    playlistLists.find((playlist) => {
-      if (playlist.name === e.target.innerText) {
-        setOpenPlayList(playlist);
-      }
-    });
+    let open = await playlistLists.find((playlist) => playlist.name === e.target.innerText);
+    setOpenPlayList(open);
     setPlaylistOpen(!playlistOpen);
   };
 
   const toggleOpen = () => {
     setPlaylistOpen(!playlistOpen);
-  }
+  };
 
-  console.log(playlistLists);
-
-  const [playlistItems, setPlaylistItems] = useState([]);
-  const [openPlayList, setOpenPlayList] = useState(null);
   if (playlistOpen) {
     return (
       <div className="App">
@@ -131,18 +154,19 @@ function App() {
             flexWrap: "wrap",
           }}
         >
-          {tracks.map((track) => (
+          {tracks.map((track, index) => (
             <Track
+              index={index}
               track={track}
               checkPlaylist={checkPlaylist}
-              isAdding={isAdding}
-              list={playlistLists}
+              // isAdding={isAdding}
+              // list={playlistLists}
             />
           ))}
           {isAdding ? (
-            <div>
+            <div style={showPosition}>
               {playlistLists.map((playlist) => (
-                <p>{playlist.name}</p>
+                <p onClick={(e) => handlePlaylistChoice(e)}>{playlist.name}</p>
               ))}
             </div>
           ) : (
@@ -155,13 +179,14 @@ function App() {
               playlist={playlistName}
               updatePlaylistName={playListNameChangeHandler}
               submit={createdPlaylist}
+              isCreating={toggleCreating}
             />
           ) : (
             <Playlist
-              openPlaylist={openPlaylist}
+              openPlaylist={findToOpen}
               playlist={playlistName}
               playlists={playlistLists}
-              playlistItems={playlistItems}
+              playlistItems={playlistLists}
               createPlaylist={createPlaylist}
               isCreating={isCreating}
             />

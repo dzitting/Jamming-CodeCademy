@@ -9,7 +9,7 @@ function Playlist(props) {
         <p>There are no Playlists yet</p>
       ) : (
         props.playlists.map((playlist, key) => (
-          <h2 onClick={props.openPlaylist} className={styles.playlist} key={key}>{playlist.name}</h2>
+          <h2 id={`list-${key}`} onClick={props.openPlaylist} className={styles.playlist} key={key}>{playlist.name}</h2>
         ))
       )}
 
