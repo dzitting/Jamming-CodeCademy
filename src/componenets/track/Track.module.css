@@ -1,0 +1,17 @@
+.name {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.artist {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.album {
+    font-size: 18px;
+    text-align: center;
+}
