@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./Track.module.css";
 
 function Track({ track, checkPlaylist, isAdding, list }) {
+  
   return (
     <div className={styles.div}>
       <h1 className={styles.name}>{track.name}</h1>

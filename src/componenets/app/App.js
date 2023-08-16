@@ -74,15 +74,11 @@ function App() {
   };
 
   const [isAdding, setIsAdding] = useState(false);
-  const openWhichList = () => {
-    //Shows options of where to add a song
-    setIsAdding(!isAdding);
-  };
 
   const checkPlaylist = (e) => {
     //Adds a song to the playlist
     e.preventDefault();
-    openWhichList();
+    setIsAdding(!isAdding);
     setPlaylistItems((prev) => [...prev, e.target.innerText]);
     console.log(playlistItems);
   };
@@ -100,6 +96,10 @@ function App() {
     setPlaylistOpen(!playlistOpen);
   };
 
+  const toggleOpen = () => {
+    setPlaylistOpen(!playlistOpen);
+  }
+
   console.log(playlistLists);
 
   const [playlistItems, setPlaylistItems] = useState([]);
@@ -107,54 +107,69 @@ function App() {
   if (playlistOpen) {
     return (
       <div className="App">
-        <OpenPlaylist playlist={openPlayList} />
+        <OpenPlaylist playlist={openPlayList} open={toggleOpen} />
+      </div>
+    );
+  } else {
+    return (
+      //Returns the components into the render
+      <div className="App">
+        <SearchBar
+          submit={handleFormSubmit}
+          query={query}
+          handleQueryChange={handleQueryChange}
+        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            flexFlow: "row-wrap",
+            width: "70%",
+            float: "right",
+            margin: "0 50px",
+            flexWrap: "wrap",
+          }}
+        >
+          {tracks.map((track) => (
+            <Track
+              track={track}
+              checkPlaylist={checkPlaylist}
+              isAdding={isAdding}
+              list={playlistLists}
+            />
+          ))}
+          {isAdding ? (
+            <div>
+              {playlistLists.map((playlist) => (
+                <p>{playlist.name}</p>
+              ))}
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", width: "20%" }}>
+          {isCreating ? (
+            <CreateAPlaylist
+              playlist={playlistName}
+              updatePlaylistName={playListNameChangeHandler}
+              submit={createdPlaylist}
+            />
+          ) : (
+            <Playlist
+              openPlaylist={openPlaylist}
+              playlist={playlistName}
+              playlists={playlistLists}
+              playlistItems={playlistItems}
+              createPlaylist={createPlaylist}
+              isCreating={isCreating}
+            />
+          )}
+        </div>
       </div>
     );
   }
-  return (
-    //Returns the components into the render
-    <div className="App">
-      <SearchBar
-        submit={handleFormSubmit}
-        query={query}
-        handleQueryChange={handleQueryChange}
-      />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          flexFlow: "row-wrap",
-          width: "70%",
-          float: "right",
-          margin: "0 50px",
-          flexWrap: "wrap",
-        }}
-      >
-        {tracks.map((track) => (
-          <Track track={track} checkPlaylist={checkPlaylist} isAdding={isAdding} list={playlistLists} />
-        ))}
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", width: "20%" }}>
-        {isCreating ? (
-          <CreateAPlaylist
-            playlist={playlistName}
-            updatePlaylistName={playListNameChangeHandler}
-            submit={createdPlaylist}
-          />
-        ) : (
-          <Playlist
-            openPlaylist={openPlaylist}
-            playlist={playlistName}
-            playlists={playlistLists}
-            playlistItems={playlistItems}
-            createPlaylist={createPlaylist}
-            isCreating={isCreating}
-          />
-        )}
-      </div>
-    </div>
-  );
 }
 
 export default App;

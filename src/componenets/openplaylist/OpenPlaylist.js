@@ -11,6 +11,7 @@ const OpenPlaylist = (props) => {
                     <h1 key={key} >{track.name}</h1>
                 ))
             )}
+            <button onClick={props.open}>Back</button>
         </>
     );
 };
