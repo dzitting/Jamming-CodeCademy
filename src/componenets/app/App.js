@@ -3,9 +3,12 @@ import "./App.css";
 import SearchBar from "../searchbar/SearchBar";
 import Track from "../track/Track";
 import Playlist from "../playlist/Playlist";
+import CreateAPlaylist from "../createaplaylist/CreateAPlaylist";
+import OpenPlaylist from "../openplaylist/OpenPlaylist";
 
 function App() {
   const [tracks, setTracks] = useState([]); //state for saving tracks
+  const [playlistName, setPlaylistName] = useState("");
   const data = [
     //Temp data for API call
     { name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
@@ -44,7 +47,49 @@ function App() {
     setTracks(searchName);
   };
 
-  console.log(tracks);
+  const [isCreating, setIsCreating] = useState(false);
+  const [playlistLists, setPlaylistLists] = useState([]);
+  const createdPlaylist = () => {
+    //Creates a new playlist on submit
+    setIsCreating(!isCreating);
+    setPlaylistLists((prev) => [
+      ...prev,
+      {
+        name: playlistName,
+        items: playlistItems,
+      },
+    ]);
+  };
+  const createPlaylist = () => {
+    //Creates a new playlist
+    setPlaylistName(null);
+    setIsCreating(!isCreating);
+  };
+
+  const playListNameChangeHandler = (e) => {
+    //Sets the playlist name
+    e.preventDefault();
+    setPlaylistName(e.target.value);
+  };
+
+  const [playlistOpen, setPlaylistOpen] = useState(false);
+
+  const openPlaylist = (e) => {
+    //Opens the playlist
+    e.preventDefault();
+    setPlaylistOpen(!playlistOpen);
+  }
+
+  console.log(playlistLists);
+
+  const [playlistItems, setPlaylistItems] = useState([]);
+  if(playlistOpen) {
+    return (
+      <div className="App">
+        <OpenPlaylist />
+      </div>
+    )
+  }
   return (
     //Returns the components into the render
     <div className="App">
@@ -53,10 +98,37 @@ function App() {
         query={query}
         handleQueryChange={handleQueryChange}
       />
-      {tracks.map((track) => (
-        <Track track={track} />
-      ))}
-      <Playlist />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          width: "70%",
+          float: "right",
+        }}
+      >
+        {tracks.map((track) => (
+          <Track track={track} />
+        ))}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", width: "30%" }}>
+        {isCreating ? (
+          <CreateAPlaylist
+            playlist={playlistName}
+            updatePlaylistName={playListNameChangeHandler}
+            submit={createdPlaylist}
+          />
+        ) : (
+          <Playlist
+            openPlaylist={openPlaylist}
+            playlist={playlistName}
+            playlists={playlistLists}
+            playlistItems={playlistItems}
+            createPlaylist={createPlaylist}
+            isCreating={isCreating}
+          />
+        )}
+      </div>
     </div>
   );
 }
