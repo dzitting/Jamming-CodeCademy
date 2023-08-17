@@ -14,6 +14,7 @@ function App() {
     { name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
     { name: "Make Me", artist: "Sall", album: "Lil", id: 4 },
   ];
+
   //Some styles
   const playlistStyle = {
     borderBottom: "1px solid black",
@@ -23,7 +24,7 @@ function App() {
   };
 
   //
-  //20 - 46 Is used for searching and returning search query results
+  //29 - 55 Is used for searching and returning search query results
   //
   const [showingTracks, setShowingTracks] = useState(data); //Initializes showingTracks to data
   const [query, setQuery] = useState(""); //Initializes query to empty string
@@ -54,7 +55,7 @@ function App() {
   };
 
   //
-  //60 - 94 Is used for creating a new playlist and setting the name
+  //61 - 95 Is used for creating a new playlist and setting the name
   //
 
   const [playlists, setPlaylists] = useState([]); //Initializes playlists to empty array
@@ -94,7 +95,7 @@ function App() {
   };
 
   //
-  //
+  // 101 - 132 Is used for adding a song to a playlist
   //
 
   const [isAddingSong, setIsAddingSong] = useState(false);
@@ -114,9 +115,11 @@ function App() {
     const rect = e.target.getBoundingClientRect(); //Receives the position of the button pressed
     console.log(`Adding song to playlist from ${index}`);
 
-    if (rect) { //If rect has been received
+    if (rect) {
+      //If rect has been received
       console.log(`rect exists`);
-      setShowPosition({ //Sets the showPosition state to the correct position
+      setShowPosition({
+        //Sets the showPosition state to the correct position
         position: "absolute",
         top: rect.top + 22,
         left: rect.left,
@@ -130,42 +133,65 @@ function App() {
     console.log(isAddingSong);
   };
 
-  const choosePlaylist = (e) => { //When the playlist is clicked where the song needs added
+  const choosePlaylist = (e) => {
+    //When the playlist is clicked where the song needs added
     e.preventDefault();
     console.log(`Selected playlist ${e.target.innerText}`);
     setIsAddingSong(!isAddingSong); //Toggles the drop menu off
     setShowPosition({}); //Resets the showPosition
-    setPlaylists((prev) => //Copies and updates the previous version of the playlists with the new songs to add
-      prev.map((playlist) => {
-        if (playlist.name === e.target.innerText) {
-          return {
-            ...playlist,
-            items: [...playlist.items, songToAdd],
-          };
-        }
-        return playlist;
-      })
-    );
+    if (!checkIfAdded(songToAdd, e.target.innerText)) { //Calls checkIfAdded and passes the song supposed to be added, and the name of the playlist to check that the song is not already there
+      setPlaylists( //If checkIfAdded returns false, it will add song to the specified playlist
+        (
+          prev //Copies and updates the previous version of the playlists with the new songs to add
+        ) =>
+          prev.map((playlist) => {
+            if (playlist.name === e.target.innerText) {
+              return {
+                ...playlist,
+                items: [...playlist.items, songToAdd],
+              };
+            }
+            return playlist;
+          })
+      );
+    } else {
+      alert(`This song is already in the playlist!`);
+    }
+  };
+
+  const checkIfAdded = (song, name) => {
+    // Checks if the song is already in the playlist
+    let existsInPlaylist = false; //Initializes existsInPlaylist to false
+    const checkingList = playlists.find((playlist) => playlist.name === name); //returns the playlist information to be checked
+    checkingList.items.forEach((item) => { //Checks each item for a duplicate
+      if (item.id === song.id) { //If two ids are the same, the song is already in the playlist
+        existsInPlaylist = true; //Returns true
+      }
+    });
+    return existsInPlaylist;
   };
 
   //
-  //
+  // 157 - 169 Is used for opening a playlist
   //
 
   const [isPlaylistOpen, setIsPlaylistOpen] = useState(false); //Initializes isPlaylistOpen to false
   const [selectedPlaylist, setSelectedPlaylist] = useState({}); //Initializes selectedPlaylist to empty object
 
-  const openPlaylist = (e) => { //When a playlist is clicked it toggles it to open
+  const openPlaylist = (e) => {
+    //When a playlist is clicked it toggles it to open
     const selected = e.target.innerText; //Finds the name of the playlist and sets it to selected
     console.log(`value is ${selected}`);
     setIsPlaylistOpen(!isPlaylistOpen);
-    setSelectedPlaylist(playlists.find((playlist) => playlist.name === selected)); //Makes selectedPlaylist equal to the playlist with the name
+    setSelectedPlaylist(
+      playlists.find((playlist) => playlist.name === selected)
+    ); //Makes selectedPlaylist equal to the playlist with the name
     console.log(selectedPlaylist.name);
-  }
+  };
 
   const toggleOpen = () => {
     setIsPlaylistOpen(!isPlaylistOpen); //Toggles isPlaylistOpen when clicking back button
-  }
+  };
 
   if (isPlaylistOpen) {
     return <OpenPlaylist playlist={selectedPlaylist} open={toggleOpen} />;
