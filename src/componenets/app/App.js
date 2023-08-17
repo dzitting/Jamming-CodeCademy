@@ -148,7 +148,8 @@ function App() {
           prev //Copies and updates the previous version of the playlists with the new songs to add
         ) =>
           prev.map((playlist) => {
-            if (playlist.name === e.target.innerText) { //Finds the playlist with the same name
+            if (playlist.name === e.target.innerText) {
+              //Finds the playlist with the same name
               return {
                 ...playlist,
                 items: [...playlist.items, songToAdd], //Adds new song to the playlist.items
@@ -200,48 +201,89 @@ function App() {
   };
 
   //
-  //
+  // 207 - 245 Allows the user to change the name of the playlist
   //
 
   //Changes the playlist's name
   const [editingName, setEditingName] = useState(false); //Initializes editingName to false
-  const changePlaylistName = (e) => { //Called when edit name button is clicked
+  const changePlaylistName = (e) => {
+    //Called when edit name button is clicked
     e.preventDefault();
     setEditingName(!editingName); //Sets editng to true
   };
-  const updatingNameEdit = (e) => { //The onchange function for the edit name
+  const updatingNameEdit = (e) => {
+    //The onchange function for the edit name
     e.preventDefault();
-    setSelectedPlaylist({   //The selected playlist's name is updated synchronously
+    setSelectedPlaylist({
+      //The selected playlist's name is updated synchronously
       ...selectedPlaylist,
       name: e.target.value,
     });
-    setPlaylists((prevPlaylists) => //Updates the playlists to reflect the change to the selected Playlist
-    prevPlaylists.map((playlist) => {
-      if (playlist.key === selectedPlaylist.key) { //Finds the playlist with the same key
-        return {
-          ...playlist,
-          name: selectedPlaylist.name, //Updates the name
-        };
-        }
-        return playlist; //Returns the playlist with each updated keystroke/change
-      })
+    setPlaylists(
+      (
+        prevPlaylists //Updates the playlists to reflect the change to the selected Playlist
+      ) =>
+        prevPlaylists.map((playlist) => {
+          if (playlist.key === selectedPlaylist.key) {
+            //Finds the playlist with the same key
+            return {
+              ...playlist,
+              name: selectedPlaylist.name, //Updates the name
+            };
+          }
+          return playlist; //Returns the playlist with each updated keystroke/change
+        })
     );
   };
-  
-  const confirmUpdate = (e) => { //Called when submission is sent
+
+  const confirmUpdate = (e) => {
+    //Called when submission is sent
     e.preventDefault();
-    setPlaylists((prevPlaylists) => //Updates the playlists for a final time ensuring final change is registered
-      prevPlaylists.map((playlist) => {
-        if (playlist.key === selectedPlaylist.key) { //Finds the playlist with the same key
-          return {
-            ...playlist,
-            name: selectedPlaylist.name, //Takes the selectedPlaylists current/accurate name and updates
-          };
-        }
-        return playlist; //Returns the playlist with each updated keystroke/change
-      })
+    setPlaylists(
+      (
+        prevPlaylists //Updates the playlists for a final time ensuring final change is registered
+      ) =>
+        prevPlaylists.map((playlist) => {
+          if (playlist.key === selectedPlaylist.key) {
+            //Finds the playlist with the same key
+            return {
+              ...playlist,
+              name: selectedPlaylist.name, //Takes the selectedPlaylists current/accurate name and updates
+            };
+          }
+          return playlist; //Returns the playlist with each updated keystroke/change
+        })
     );
     setEditingName(false); //Set the editing to false
+  };
+
+  //
+  //
+  //
+
+  const removeSong = (e) => {
+    e.preventDefault();
+    console.log(
+      `Removing ${e.target.previousElementSibling.innerText} from ${selectedPlaylist.name}`
+    );
+    const remove = parseInt(e.target.previousElementSibling.id);
+
+    setSelectedPlaylist((prevSelectedPlaylist) => ({
+      ...prevSelectedPlaylist,
+      items: prevSelectedPlaylist.items.filter((item) => item.id !== remove),
+    }));
+    
+    setPlaylists((prevPlaylists) => {
+      return prevPlaylists.map((playlist) => {
+        if (playlist.key === selectedPlaylist.key) {
+          return {
+            ...playlist,
+            items: playlist.items.filter((item) => item.id !== remove),
+          };
+        }
+        return playlist;
+      });
+    });
   };
 
   if (isPlaylistOpen) {
@@ -253,6 +295,7 @@ function App() {
         open={toggleOpen}
         changePlaylistName={changePlaylistName}
         editingName={editingName}
+        removeSong={removeSong}
       />
     );
   } else {
