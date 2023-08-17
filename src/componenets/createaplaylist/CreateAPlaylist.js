@@ -6,9 +6,9 @@ function CreateAPlaylist(props) {
         <div>
             <h1>Create A Playlist</h1>
             <form onSubmit={props.submit}>
-                <input onChange={props.updatePlaylistName} type="text" placeholder="Playlist Name" value={props.playlist}/>
+                <input onChange={props.updateName} type="text" placeholder="Playlist Name" value={props.playlistName}/>
                 <button type="submit">Create</button>
-                <button onClick={props.isCreating}>Back</button>
+                <button onClick={props.isCreating} type="button">Back</button>
             </form>
         </div>
     );

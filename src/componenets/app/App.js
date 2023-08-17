@@ -7,35 +7,41 @@ import CreateAPlaylist from "../createaplaylist/CreateAPlaylist";
 import OpenPlaylist from "../openplaylist/OpenPlaylist";
 
 function App() {
-  const [tracks, setTracks] = useState([]); //state for saving tracks
-  const [playlistName, setPlaylistName] = useState(""); //Used to move into playlistLists.name and later add items into the list
   const data = [
     //Temp data for API call
-    {name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
-    {name: "Alone", artist: "Samus", album: "My Word", id: 2 },
-    {name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
-    {name: "Make Me", artist: "Sall", album: "Lil", id: 4 },
+    { name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
+    { name: "Alone", artist: "Samus", album: "My Word", id: 2 },
+    { name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
+    { name: "Make Me", artist: "Sall", album: "Lil", id: 4 },
   ];
+  //Some styles
+  const playlistStyle = {
+    borderBottom: "1px solid black",
+    backgroundColor: "darksalmon",
+    padding: 5,
+    textAlign: "center",
+  };
 
-  useEffect(() => {
-    //Will all to API to retrieve and set data
-    setTracks(data);
-  }, []);
+  //
+  //20 - 46 Is used for searching and returning search query results
+  //
+  const [showingTracks, setShowingTracks] = useState(data); //Initializes showingTracks to data
+  const [query, setQuery] = useState(""); //Initializes query to empty string
 
-  const [query, setQuery] = useState(""); //State for saving the query
-
-  const handleQueryChange = (e) => {
+  const handleSearchChange = (e) => {
     //Handles the onChange for SearchBar user input
+    e.preventDefault();
     setQuery(e.target.value); //Sets the value to whatever the user typs and saves in query state
   };
 
-  const handleFormSubmit = (e) => {
+  const handleSubmit = (e) => {
     //Handles the submission in SearchBar of the form to filter the tracks appearing
     e.preventDefault();
     filterTracks(query); //Calls filterTracks and passes the query
   };
 
   const filterTracks = (query) => {
+    //Filters the tracks for any keywords matching query
     const searchName = data.filter((track) => {
       const lowerCaseQuery = query.toLowerCase();
       return (
@@ -44,104 +50,134 @@ function App() {
         track.album.toLowerCase().includes(lowerCaseQuery)
       );
     });
-    setTracks(searchName);
+    setShowingTracks(searchName);
   };
 
-  const [isCreating, setIsCreating] = useState(false);
-  const [playlistLists, setPlaylistLists] = useState([]);
-  const createdPlaylist = () => {
-    //Creates a new playlist on submit
-    setIsCreating(!isCreating);
-    setPlaylistLists((prev) => [
-      ...prev,
-      {
-        name: playlistName,
-        items: [],
-      }
-    ]);
+  //
+  //60 - 94 Is used for creating a new playlist and setting the name
+  //
+
+  const [playlists, setPlaylists] = useState([]); //Initializes playlists to empty array
+  const [createPlaylistName, setCreatePlaylistName] = useState(""); //Initializes createPlaylistName to empty string
+  const [isCreating, setIsCreating] = useState(false); //Initializes isCreating to false
+
+  const createPlaylist = (e) => {
+    //When the name of the playlist is submitted, it opens CreateAPlaylist to set a playlistName
+    e.preventDefault();
+    setIsCreating(!isCreating); //Toggles whether isCreating is true or false and thus CreateAPlaylist shows or not
+    if (createPlaylistName !== "") {
+      //If the playlist name is not empty string
+      setPlaylists((prev) => [
+        //Updates the playlists array by copying all contents plus adding the new playlist
+        ...prev,
+        {
+          name: createPlaylistName,
+          items: [],
+        }, //Updates the playlists array with new playlist name
+      ]);
+      console.log(`Created a new playlist ${createPlaylistName}`);
+    }
+    setCreatePlaylistName(""); //Resets the createPlaylistName to an empty string
+    console.log(playlists.length);
   };
-  //When creating, allows back button to toggle isCreating
+
+  const handleNameCreation = (e) => {
+    //Updates the createPlaylistName state as it is typed to ensure accurate name
+    e.preventDefault();
+    setCreatePlaylistName(e.target.value);
+    console.log(createPlaylistName);
+  };
+
   const toggleCreating = () => {
+    //Toggles creating mode from the back button in CreateAPlaylist
     setIsCreating(!isCreating);
+  };
+
+  //
+  //
+  //
+
+  const [isAddingSong, setIsAddingSong] = useState(false);
+  const [showPosition, setShowPosition] = useState({});
+  const [songToAdd, setSongToAdd] = useState({});
+
+  const handleAddSong = (e, index) => {
+    e.preventDefault();
+    if (playlists.length < 1) {
+      //Ensures there is a playlist to add to
+      alert(`Please create a playlist first!`);
+      return;
+    }
+
+    setIsAddingSong(!isAddingSong); //Toggles whether the drop menu is visible
+    setSongToAdd(data[index]);
+    const rect = e.target.getBoundingClientRect(); //Receives the position of the button pressed
+    console.log(`Adding song to playlist from ${index}`);
+
+    if (rect) {
+      console.log(`rect exists`);
+      setShowPosition({
+        position: "absolute",
+        top: rect.top + 22,
+        left: rect.left,
+        cursor: "pointer",
+        backgroundColor: "darksalmon",
+        margin: 0,
+        height: "min-content",
+        width: 100,
+      });
+    }
+    console.log(isAddingSong);
+  };
+
+  const choosePlaylist = (e) => {
+    e.preventDefault();
+    console.log(`Selected playlist ${e.target.innerText}`);
+    setIsAddingSong(!isAddingSong); //Toggles the drop menu off
+    setShowPosition({}); //Resets the showPosition
+    setPlaylists((prev) =>
+      prev.map((playlist) => {
+        if (playlist.name === e.target.innerText) {
+          return {
+            ...playlist,
+            items: [...playlist.items, songToAdd],
+          };
+        }
+        return playlist;
+      })
+    );
+  };
+
+  //
+  //
+  //
+
+  const [isPlaylistOpen, setIsPlaylistOpen] = useState(false);
+  const [selectedPlaylist, setSelectedPlaylist] = useState({});
+
+  const openPlaylist = (e) => {
+    const selected = e.target.innerText;
+    console.log(`value is ${selected}`);
+    setIsPlaylistOpen(!isPlaylistOpen);
+    setSelectedPlaylist(playlists.find((playlist) => playlist.name === selected));
+    console.log(selectedPlaylist.name);
   }
-  const createPlaylist = () => {
-    //Creates a new playlist
-    setPlaylistName(null);
-    setIsCreating(!isCreating);
-  };
-
-  const playListNameChangeHandler = (e) => {
-    //Sets the playlist name
-    e.preventDefault();
-    setPlaylistName(e.target.value);
-  };
-
-  const [isAdding, setIsAdding] = useState(false);
-  const [showPosition, setShowPosition] = useState(null);
-  const [toAdd, setToAdd] = useState(null);
-  let rect = {};
-
-  const checkPlaylist = async (e, parentId) => {
-    //Adds a song to the playlist
-    e.preventDefault();
-    await setToAdd(parentId);
-    rect = e.target.getBoundingClientRect();
-    setIsAdding(!isAdding);
-    setShowPosition({
-      position: "absolute",
-      top: rect.top,
-      left: rect.left,
-      marginTop: 10,
-      cursor: "pointer",
-    });
-  };
-
-  const handlePlaylistChoice = async (e) => {
-    //Handles the playlist choice made when the user clicks 'Add to Playlist'
-    e.preventDefault();
-    await setPlaylistName(e.target.innerText);
-    let addTrack = await data.find((item) => {
-      let search = parseInt(toAdd.substring(6));
-      if (item.id === search) {
-        return item;
-      }
-    })
-    const editPlaylist = playlistLists.find((playlist) => playlist.name === e.target.innerText);
-
-    editPlaylist.items.push(addTrack);
-    setIsAdding(!isAdding);
-  };
-
-  const [playlistOpen, setPlaylistOpen] = useState(false);
-  const [openPlayList, setOpenPlayList] = useState({});
-
-  //Opens the playlist
-  const findToOpen = async (e) => {
-    e.preventDefault();
-    let open = await playlistLists.find((playlist) => playlist.name === e.target.innerText);
-    setOpenPlayList(open);
-    setPlaylistOpen(!playlistOpen);
-  };
 
   const toggleOpen = () => {
-    setPlaylistOpen(!playlistOpen);
-  };
+    setIsPlaylistOpen(!isPlaylistOpen);
+  }
 
-  if (playlistOpen) {
-    return (
-      <div className="App">
-        <OpenPlaylist playlist={openPlayList} open={toggleOpen} />
-      </div>
-    );
+  if (isPlaylistOpen) {
+    return <OpenPlaylist playlist={selectedPlaylist} open={toggleOpen} />;
   } else {
     return (
-      //Returns the components into the render
       <div className="App">
         <SearchBar
-          submit={handleFormSubmit}
+          submit={handleSubmit}
           query={query}
-          handleQueryChange={handleQueryChange}
+          handleSearchChange={handleSearchChange}
         />
+
         <div
           style={{
             display: "flex",
@@ -154,20 +190,28 @@ function App() {
             flexWrap: "wrap",
           }}
         >
-          {tracks.map((track, index) => (
+          {showingTracks.map((track, index) => (
             <Track
-              index={index}
               track={track}
-              checkPlaylist={checkPlaylist}
-              // isAdding={isAdding}
-              // list={playlistLists}
+              index={index}
+              key={track.id}
+              handleAddSong={handleAddSong}
             />
           ))}
-          {isAdding ? (
+          {isAddingSong ? (
             <div style={showPosition}>
-              {playlistLists.map((playlist) => (
-                <p onClick={(e) => handlePlaylistChoice(e)}>{playlist.name}</p>
-              ))}
+              {playlists.map((playlist, index) => {
+                return (
+                  <p
+                    onClick={choosePlaylist}
+                    style={playlistStyle}
+                    id={`opt-${index}`}
+                    key={`listOpt-${index}`}
+                  >
+                    {playlist.name}
+                  </p>
+                );
+              })}
             </div>
           ) : (
             <></>
@@ -176,19 +220,17 @@ function App() {
         <div style={{ display: "flex", flexDirection: "column", width: "20%" }}>
           {isCreating ? (
             <CreateAPlaylist
-              playlist={playlistName}
-              updatePlaylistName={playListNameChangeHandler}
-              submit={createdPlaylist}
               isCreating={toggleCreating}
+              updateName={handleNameCreation}
+              playlistName={createPlaylistName}
+              submit={createPlaylist}
             />
           ) : (
             <Playlist
-              openPlaylist={findToOpen}
-              playlist={playlistName}
-              playlists={playlistLists}
-              playlistItems={playlistLists}
+              playlists={playlists}
+              playlistName={createPlaylistName}
               createPlaylist={createPlaylist}
-              isCreating={isCreating}
+              openPlaylist={openPlaylist}
             />
           )}
         </div>

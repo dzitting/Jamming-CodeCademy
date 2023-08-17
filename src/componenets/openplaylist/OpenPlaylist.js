@@ -1,7 +1,8 @@
 import React from 'react';
 
-const OpenPlaylist = (props) => {
-    if (!props) {
+function OpenPlaylist(props) {
+  console.log(props.playlist);
+    if (!props.playlist || !props.playlist.items) {
       // Playlist data is not yet available, show loading state
       return <p>Loading...</p>;
     }

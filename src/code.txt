@@ -1,0 +1,225 @@
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import SearchBar from "../searchbar/SearchBar";
+import Track from "../track/Track";
+import Playlist from "../playlist/Playlist";
+import CreateAPlaylist from "../createaplaylist/CreateAPlaylist";
+import OpenPlaylist from "../openplaylist/OpenPlaylist";
+
+function App() {
+  const [tracks, setTracks] = useState([]); //state for saving tracks
+  const [playlistName, setPlaylistName] = useState(""); //Used to move into playlistLists.name and later add items into the list
+  const data = [
+    //Temp data for API call
+    {name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
+    {name: "Alone", artist: "Samus", album: "My Word", id: 2 },
+    {name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
+    {name: "Make Me", artist: "Sall", album: "Lil", id: 4 },
+  ];
+
+  useEffect(() => {
+    //Will all to API to retrieve and set data
+    setTracks(data);
+  }, []);
+
+  const [query, setQuery] = useState(""); //State for saving the query
+
+  const handleQueryChange = (e) => {
+    //Handles the onChange for SearchBar user input
+    setQuery(e.target.value); //Sets the value to whatever the user typs and saves in query state
+  };
+
+  const handleFormSubmit = (e) => {
+    //Handles the submission in SearchBar of the form to filter the tracks appearing
+    e.preventDefault();
+    filterTracks(query); //Calls filterTracks and passes the query
+  };
+
+  const filterTracks = (query) => {
+    const searchName = data.filter((track, key) => {
+      const lowerCaseQuery = query.toLowerCase();
+      return (
+        track.name.toLowerCase().includes(lowerCaseQuery) ||
+        track.artist.toLowerCase().includes(lowerCaseQuery) ||
+        track.album.toLowerCase().includes(lowerCaseQuery)
+      );
+    });
+    setTracks(searchName);
+  };
+
+  const [isCreating, setIsCreating] = useState(false);
+  const [playlistLists, setPlaylistLists] = useState([]);
+  const createdPlaylist = () => {
+    //Creates a new playlist on submit
+    setIsCreating(!isCreating);
+    setPlaylistLists((prev) => [
+      ...prev,
+      {
+        name: playlistName,
+        items: [],
+      }
+    ]);
+  };
+  //When creating, allows back button to toggle isCreating
+  const toggleCreating = () => {
+    setIsCreating(!isCreating);
+  }
+  const createPlaylist = () => {
+    //Creates a new playlist
+    setPlaylistName('');
+    setIsCreating(!isCreating);
+  };
+
+  const playListNameChangeHandler = (e) => {
+    //Sets the playlist name
+    e.preventDefault();
+    setPlaylistName(e.target.value);
+  };
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [showPosition, setShowPosition] = useState(null);
+  const [toAdd, setToAdd] = useState(null);
+  let rect = {};
+
+  const checkPlaylist = (e, parentId) => {
+    //Adds a song to the playlist
+    e.preventDefault();
+    setToAdd(parentId);
+    rect = e.target.getBoundingClientRect();
+    setIsAdding(!isAdding);
+    setShowPosition({
+      position: "absolute",
+      top: rect.top + 22,
+      left: rect.left,
+      cursor: "pointer",
+      backgroundColor: "darksalmon",
+      margin: 0,
+      height: 'min-content',
+      width: 100
+    });
+    console.log(`Adding song ${toAdd}`);
+  };
+
+  const playlistStyle = {
+    borderBottom: "1px solid black",
+    backgroundColor: "darksalmon",
+    padding: 5,
+    textAlign: "center",
+  }
+  const handlePlaylistChoice = (e) => {
+    e.preventDefault();
+    const playlistToAdd = e.target.innerText; // Playlist name user wants to add the song to
+    console.log(`Added to ${playlistToAdd}`);
+  
+    const newTrack = data.find((item) => {
+      const search = parseInt(toAdd.substring(6));
+      return item.id === search;
+    });
+  
+    // Find the playlist from playlistLists and create a copy with the new track added
+    setPlaylistLists((prevLists) =>
+      prevLists.map((playlist) => {
+        if (playlist.name === playlistToAdd) {
+          return {
+            ...playlist,
+            items: [...playlist.items, newTrack], // Add the new track to the existing items
+          };
+        }
+        return playlist;
+      })
+    );
+  
+    setIsAdding(!isAdding); // Reset the isAdding state
+  };
+
+  const [playlistOpen, setPlaylistOpen] = useState(false);
+  const [openPlayList, setOpenPlayList] = useState({});
+
+  //Opens the playlist
+  const findToOpen = (e) => {
+    e.preventDefault();
+    let open = playlistLists.find((playlist) => playlist.name === e.target.innerText);
+    if(open)
+    {
+      setOpenPlayList(() => open);
+      setPlaylistOpen(!playlistOpen);
+    } else {
+      console.log("Playlist not found");
+    }
+  };
+
+  const toggleOpen = () => {
+    setPlaylistOpen(!playlistOpen);
+  };
+
+  if (playlistOpen) {
+    return (
+      <div className="App">
+        <OpenPlaylist playlist={openPlayList} open={toggleOpen} />
+      </div>
+    );
+  } else {
+    return (
+      //Returns the components into the render
+      <div className="App">
+        <SearchBar
+          submit={handleFormSubmit}
+          query={query}
+          handleQueryChange={handleQueryChange}
+        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            flexFlow: "row-wrap",
+            width: "70%",
+            float: "right",
+            margin: "0 50px",
+            flexWrap: "wrap",
+          }}
+        >
+          {tracks.map((track, index) => (
+            <Track
+              index={index}
+              track={track}
+              checkPlaylist={checkPlaylist}
+              // isAdding={isAdding}
+              // list={playlistLists}
+            />
+          ))}
+          {isAdding ? (
+            <div style={showPosition}>
+              {playlistLists.map((playlist) => (
+                <p style={playlistStyle} onClick={(e) => handlePlaylistChoice(e)}>{playlist.name}</p>
+              ))}
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", width: "20%" }}>
+          {isCreating ? (
+            <CreateAPlaylist
+              playlist={playlistName}
+              updatePlaylistName={playListNameChangeHandler}
+              submit={createdPlaylist}
+              isCreating={toggleCreating}
+            />
+          ) : (
+            <Playlist
+              openPlaylist={findToOpen}
+              playlist={playlistName}
+              playlists={playlistLists}
+              playlistItems={playlistLists}
+              createPlaylist={createPlaylist}
+              isCreating={isCreating}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+}
+
+export default App;

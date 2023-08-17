@@ -1,9 +1,9 @@
 import React from "react";
 
-function SearchBar(props) {
+function SearchBar({submit, query, handleSearchChange}) {
     return (
-        <form onSubmit={props.submit}>
-            <input onChange={props.handleQueryChange} type='text' placeholder="Search" value={props.query} />
+        <form onSubmit={submit}>
+            <input onChange={handleSearchChange} type='text' placeholder="Search" value={query} />
         </form>
     );
 }
