@@ -172,7 +172,7 @@ function App() {
   };
 
   //
-  // 157 - 169 Is used for opening a playlist
+  // 157 - 194 Is used for opening a playlist
   //
 
   const [isPlaylistOpen, setIsPlaylistOpen] = useState(false); //Initializes isPlaylistOpen to false
