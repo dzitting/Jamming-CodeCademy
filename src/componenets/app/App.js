@@ -7,8 +7,11 @@ import CreateAPlaylist from "../createaplaylist/CreateAPlaylist";
 import OpenPlaylist from "../openplaylist/OpenPlaylist";
 
 function App() {
+ //Calling API
+ const baseURL = 'https://api.spotify.com'
+
+  //Temp data for API call
   const data = [
-    //Temp data for API call
     { name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
     { name: "Alone", artist: "Samus", album: "My Word", id: 2 },
     { name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
@@ -258,7 +261,7 @@ function App() {
   };
 
   //
-  //
+  // 264 - 287 allows users to remove a song and updates repsonsible states
   //
 
   const removeSong = (e) => {
