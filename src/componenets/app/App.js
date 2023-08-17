@@ -72,6 +72,7 @@ function App() {
         //Updates the playlists array by copying all contents plus adding the new playlist
         ...prev,
         {
+          key: prev.length + 1,
           name: createPlaylistName,
           items: [],
         }, //Updates the playlists array with new playlist name
@@ -139,23 +140,25 @@ function App() {
     console.log(`Selected playlist ${e.target.innerText}`);
     setIsAddingSong(!isAddingSong); //Toggles the drop menu off
     setShowPosition({}); //Resets the showPosition
-    if (!checkIfAdded(songToAdd, e.target.innerText)) { //Calls checkIfAdded and passes the song supposed to be added, and the name of the playlist to check that the song is not already there
-      setPlaylists( //If checkIfAdded returns false, it will add song to the specified playlist
+    if (!checkIfAdded(songToAdd, e.target.innerText)) {
+      //Calls checkIfAdded and passes the song supposed to be added, and the name of the playlist to check that the song is not already there
+      setPlaylists(
+        //If checkIfAdded returns false, it will add song to the specified playlist
         (
           prev //Copies and updates the previous version of the playlists with the new songs to add
         ) =>
           prev.map((playlist) => {
-            if (playlist.name === e.target.innerText) {
+            if (playlist.name === e.target.innerText) { //Finds the playlist with the same name
               return {
                 ...playlist,
-                items: [...playlist.items, songToAdd],
+                items: [...playlist.items, songToAdd], //Adds new song to the playlist.items
               };
             }
             return playlist;
           })
       );
     } else {
-      alert(`This song is already in the playlist!`);
+      alert(`This song is already in the playlist!`); //Warns of duplicate song
     }
   };
 
@@ -163,8 +166,10 @@ function App() {
     // Checks if the song is already in the playlist
     let existsInPlaylist = false; //Initializes existsInPlaylist to false
     const checkingList = playlists.find((playlist) => playlist.name === name); //returns the playlist information to be checked
-    checkingList.items.forEach((item) => { //Checks each item for a duplicate
-      if (item.id === song.id) { //If two ids are the same, the song is already in the playlist
+    checkingList.items.forEach((item) => {
+      //Checks each item for a duplicate
+      if (item.id === song.id) {
+        //If two ids are the same, the song is already in the playlist
         existsInPlaylist = true; //Returns true
       }
     });
@@ -172,7 +177,7 @@ function App() {
   };
 
   //
-  // 157 - 169 Is used for opening a playlist
+  // 157 - 194 Is used for opening a playlist
   //
 
   const [isPlaylistOpen, setIsPlaylistOpen] = useState(false); //Initializes isPlaylistOpen to false
@@ -191,10 +196,65 @@ function App() {
 
   const toggleOpen = () => {
     setIsPlaylistOpen(!isPlaylistOpen); //Toggles isPlaylistOpen when clicking back button
+    setEditingName(false);
+  };
+
+  //
+  //
+  //
+
+  //Changes the playlist's name
+  const [editingName, setEditingName] = useState(false); //Initializes editingName to false
+  const changePlaylistName = (e) => { //Called when edit name button is clicked
+    e.preventDefault();
+    setEditingName(!editingName); //Sets editng to true
+  };
+  const updatingNameEdit = (e) => { //The onchange function for the edit name
+    e.preventDefault();
+    setSelectedPlaylist({   //The selected playlist's name is updated synchronously
+      ...selectedPlaylist,
+      name: e.target.value,
+    });
+    setPlaylists((prevPlaylists) => //Updates the playlists to reflect the change to the selected Playlist
+    prevPlaylists.map((playlist) => {
+      if (playlist.key === selectedPlaylist.key) { //Finds the playlist with the same key
+        return {
+          ...playlist,
+          name: selectedPlaylist.name, //Updates the name
+        };
+        }
+        return playlist; //Returns the playlist with each updated keystroke/change
+      })
+    );
+  };
+  
+  const confirmUpdate = (e) => { //Called when submission is sent
+    e.preventDefault();
+    setPlaylists((prevPlaylists) => //Updates the playlists for a final time ensuring final change is registered
+      prevPlaylists.map((playlist) => {
+        if (playlist.key === selectedPlaylist.key) { //Finds the playlist with the same key
+          return {
+            ...playlist,
+            name: selectedPlaylist.name, //Takes the selectedPlaylists current/accurate name and updates
+          };
+        }
+        return playlist; //Returns the playlist with each updated keystroke/change
+      })
+    );
+    setEditingName(false); //Set the editing to false
   };
 
   if (isPlaylistOpen) {
-    return <OpenPlaylist playlist={selectedPlaylist} open={toggleOpen} />;
+    return (
+      <OpenPlaylist
+        confirmUpdate={confirmUpdate}
+        updatingNameEdit={updatingNameEdit}
+        playlist={selectedPlaylist}
+        open={toggleOpen}
+        changePlaylistName={changePlaylistName}
+        editingName={editingName}
+      />
+    );
   } else {
     return (
       <div className="App">
