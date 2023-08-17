@@ -114,9 +114,9 @@ function App() {
     const rect = e.target.getBoundingClientRect(); //Receives the position of the button pressed
     console.log(`Adding song to playlist from ${index}`);
 
-    if (rect) {
+    if (rect) { //If rect has been received
       console.log(`rect exists`);
-      setShowPosition({
+      setShowPosition({ //Sets the showPosition state to the correct position
         position: "absolute",
         top: rect.top + 22,
         left: rect.left,
@@ -130,12 +130,12 @@ function App() {
     console.log(isAddingSong);
   };
 
-  const choosePlaylist = (e) => {
+  const choosePlaylist = (e) => { //When the playlist is clicked where the song needs added
     e.preventDefault();
     console.log(`Selected playlist ${e.target.innerText}`);
     setIsAddingSong(!isAddingSong); //Toggles the drop menu off
     setShowPosition({}); //Resets the showPosition
-    setPlaylists((prev) =>
+    setPlaylists((prev) => //Copies and updates the previous version of the playlists with the new songs to add
       prev.map((playlist) => {
         if (playlist.name === e.target.innerText) {
           return {
@@ -152,19 +152,19 @@ function App() {
   //
   //
 
-  const [isPlaylistOpen, setIsPlaylistOpen] = useState(false);
-  const [selectedPlaylist, setSelectedPlaylist] = useState({});
+  const [isPlaylistOpen, setIsPlaylistOpen] = useState(false); //Initializes isPlaylistOpen to false
+  const [selectedPlaylist, setSelectedPlaylist] = useState({}); //Initializes selectedPlaylist to empty object
 
-  const openPlaylist = (e) => {
-    const selected = e.target.innerText;
+  const openPlaylist = (e) => { //When a playlist is clicked it toggles it to open
+    const selected = e.target.innerText; //Finds the name of the playlist and sets it to selected
     console.log(`value is ${selected}`);
     setIsPlaylistOpen(!isPlaylistOpen);
-    setSelectedPlaylist(playlists.find((playlist) => playlist.name === selected));
+    setSelectedPlaylist(playlists.find((playlist) => playlist.name === selected)); //Makes selectedPlaylist equal to the playlist with the name
     console.log(selectedPlaylist.name);
   }
 
   const toggleOpen = () => {
-    setIsPlaylistOpen(!isPlaylistOpen);
+    setIsPlaylistOpen(!isPlaylistOpen); //Toggles isPlaylistOpen when clicking back button
   }
 
   if (isPlaylistOpen) {
