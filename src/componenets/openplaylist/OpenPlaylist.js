@@ -22,7 +22,13 @@ function OpenPlaylist(props) {
 
   return (
     <>
+    {props.editingName ? (
+      <form onSubmit={props.confirmUpdate}>
+        <input onChange={props.updatingNameEdit} style={{transform: 'translateX(320%)'}} value={props.playlist.name}/>
+      </form>
+    ): (
       <h1 style={{ textAlign: "center" }}>{props.playlist.name}</h1>
+    )}
       <div
         style={{
           textAlign: "center",
@@ -48,10 +54,14 @@ function OpenPlaylist(props) {
       </div>
       <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
         <button
-          style={{ width: "fit-content", margin: "0 auto" }}
+          style={{ margin: "0 10px" }}
           onClick={props.open}
         >
           Back
+        </button>
+        <button onClick={props.changePlaylistName}
+        >
+          Edit Name
         </button>
       </div>
     </>
