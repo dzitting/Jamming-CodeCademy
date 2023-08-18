@@ -1,4 +1,5 @@
 import React from "react";
+import styles from './OpenPlaylist.module.css';
 
 function OpenPlaylist(props) {
   console.log(props.playlist);
@@ -55,15 +56,7 @@ function OpenPlaylist(props) {
               <p id={`${track.id}`}>
                 {track.name} by {track.artist} from {track.album}
               </p>
-              <button onClick={props.removeSong}
-                style={{
-                  border: "none",
-                  background: "gray",
-                  cursor: "pointer",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                  color: "white",
-                }}
+              <button className={styles.remove} onClick={props.removeSong}
               >
                 X
               </button>
@@ -74,10 +67,10 @@ function OpenPlaylist(props) {
       <div
         style={{ width: "100vw", display: "flex", justifyContent: "center" }}
       >
-        <button style={{ margin: "0 10px" }} onClick={props.open}>
+        <button className={styles.button} onClick={props.open}>
           Back
         </button>
-        <button onClick={props.changePlaylistName}>Edit Name</button>
+        <button className={styles.button} onClick={props.changePlaylistName}>Edit Name</button>
       </div>
     </>
   );
