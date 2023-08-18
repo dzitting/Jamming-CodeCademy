@@ -9,14 +9,15 @@ import OpenPlaylist from "../openplaylist/OpenPlaylist";
 
 function App() {
   const [data, setData] = useState([]);
-  const [showingTracks, setShowingTracks] = useState([]); //Initializes showingTracks to data
+  const [showingTracks, setShowingTracks] = useState(data); //Initializes showingTracks to data
   const baseUrl = `https://my.api.mockaroo.com`;
   const endPoint = `/tracks.json`;
-  const key = `?key=6846c710`;
+  const key = process.env.REACT_APP_KEY;
   // const searchTerm = `?searchTerm=${query}`;
 
   useEffect(() => {
     fetchData();
+    setShowingTracks(data);
   }, []);
 
   const fetchData = async () => {
@@ -25,12 +26,10 @@ function App() {
       if (response.ok) {
         const jsonRes = await response.json();
         setData(jsonRes);
-        console.log(data);
       }
     } catch (error) {
       console.log(`Error fetching data: ${error}`);
     }
-    setShowingTracks(data);
   };
 
   //Some styles
@@ -56,7 +55,7 @@ function App() {
   };
 
   //
-  //29 - 55 Is used for searching and returning search query results
+  //61 - 86 Is used for searching and returning search query results
   //
   const [query, setQuery] = useState(""); //Initializes query to empty string
 
@@ -337,7 +336,6 @@ function App() {
           query={query}
           handleSearchChange={handleSearchChange}
         />
-
         <div style={scrollDiv}>
           {showingTracks.map((track, index) => (
             <Track
@@ -347,23 +345,19 @@ function App() {
               handleAddSong={handleAddSong}
             />
           ))}
-          {isAddingSong ? (
+          {isAddingSong && (
             <div style={showPosition}>
-              {playlists.map((playlist, index) => {
-                return (
-                  <p
-                    onClick={choosePlaylist}
-                    style={playlistStyle}
-                    id={`opt-${index}`}
-                    key={`listOpt-${index}`}
-                  >
-                    {playlist.name}
-                  </p>
-                );
-              })}
+              {playlists.map((playlist, index) => (
+                <p
+                  onClick={choosePlaylist}
+                  style={playlistStyle}
+                  id={`opt-${index}`}
+                  key={`listOpt-${index}`}
+                >
+                  {playlist.name}
+                </p>
+              ))}
             </div>
-          ) : (
-            <></>
           )}
         </div>
         <div
