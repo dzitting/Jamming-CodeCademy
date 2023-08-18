@@ -4,7 +4,8 @@ import styles from "./Playlist.module.css";
 function Playlist(props) {
   return (
     <>
-      <h1 className={styles.title}>Playlists</h1>
+      <h1 className={styles.title} style={{boxShadow: "0px 2px 2px black"}}>Playlists</h1>
+      <button className={styles.button} onClick={props.createPlaylist}>Create Playlist</button>
       {props.playlists.length < 1 ? (
         <p>There are no Playlists yet</p>
       ) : (
@@ -13,7 +14,6 @@ function Playlist(props) {
         ))
       )}
 
-      <button className={styles.button} onClick={props.createPlaylist}>Create Playlist</button>
     </>
   );
 }

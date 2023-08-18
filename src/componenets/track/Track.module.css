@@ -1,21 +1,55 @@
 .div {
     width: 25%;
+    max-height: 300px;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0px;
 }
 
 .name {
-    font-size: 32px;
+    font-size: 18px;
     font-weight: bold;
     text-align: center;
     margin-bottom: 10px;
 }
 
 .artist {
-    font-size: 24px;
+    font-size: 16px;
     text-align: center;
     margin-bottom: 10px;
 }
 
 .album {
-    font-size: 18px;
+    font-size: 12px;
     text-align: center;
 }
+
+.button {
+    border: none;
+    background-color: transparent;
+    transform: scale(1);
+    transition: 200ms ease-in-out;
+}
+
+.button:hover {
+    cursor: pointer;
+    transform: scale(1.1) translateY(-2px);
+    transition: 200ms ease-in-out;
+}
+
+div::-webkit-scrollbar {
+    width: 12px;               /* width of the entire scrollbar */
+  }
+  
+  div::-webkit-scrollbar-track {
+    background: #463239;        /* color of the tracking area */
+  }
+  
+  div::-webkit-scrollbar-thumb {
+    background-color: #fab3a9;    /* color of the scroll thumb */
+    border-radius: 20px;       /* roundness of the scroll thumb */
+    border: 3px solid #463239;  /* creates padding around scroll thumb */
+  }

@@ -5,18 +5,33 @@ import Track from "../track/Track";
 import Playlist from "../playlist/Playlist";
 import CreateAPlaylist from "../createaplaylist/CreateAPlaylist";
 import OpenPlaylist from "../openplaylist/OpenPlaylist";
+// require("dotenv").config();
 
 function App() {
- //Calling API
- const baseURL = 'https://api.spotify.com'
+  const [data, setData] = useState([]);
+  const [showingTracks, setShowingTracks] = useState([]); //Initializes showingTracks to data
+  const baseUrl = `https://my.api.mockaroo.com`;
+  const endPoint = `/tracks.json`;
+  const key = `?key=6846c710`;
+  // const searchTerm = `?searchTerm=${query}`;
 
-  //Temp data for API call
-  const data = [
-    { name: "Missing You", artist: "Lil Something", album: "Rainy Day", id: 1 },
-    { name: "Alone", artist: "Samus", album: "My Word", id: 2 },
-    { name: "Alone", artist: "Melvin", album: "My Word", id: 3 },
-    { name: "Make Me", artist: "Sall", album: "Lil", id: 4 },
-  ];
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${baseUrl}${endPoint}${key}`);
+      if (response.ok) {
+        const jsonRes = await response.json();
+        setData(jsonRes);
+        console.log(data);
+      }
+    } catch (error) {
+      console.log(`Error fetching data: ${error}`);
+    }
+    setShowingTracks(data);
+  };
 
   //Some styles
   const playlistStyle = {
@@ -26,10 +41,23 @@ function App() {
     textAlign: "center",
   };
 
+  const scrollDiv = {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flexFlow: "row-wrap",
+    width: "70%",
+    float: "right",
+    margin: "0 50px",
+    flexWrap: "wrap",
+    maxHeight: "85vh",
+    overflowY: "auto",
+    overflowX: "hidden",
+  };
+
   //
   //29 - 55 Is used for searching and returning search query results
   //
-  const [showingTracks, setShowingTracks] = useState(data); //Initializes showingTracks to data
   const [query, setQuery] = useState(""); //Initializes query to empty string
 
   const handleSearchChange = (e) => {
@@ -49,7 +77,7 @@ function App() {
     const searchName = data.filter((track) => {
       const lowerCaseQuery = query.toLowerCase();
       return (
-        track.name.toLowerCase().includes(lowerCaseQuery) ||
+        track.track_name.toLowerCase().includes(lowerCaseQuery) ||
         track.artist.toLowerCase().includes(lowerCaseQuery) ||
         track.album.toLowerCase().includes(lowerCaseQuery)
       );
@@ -275,7 +303,7 @@ function App() {
       ...prevSelectedPlaylist,
       items: prevSelectedPlaylist.items.filter((item) => item.id !== remove),
     }));
-    
+
     setPlaylists((prevPlaylists) => {
       return prevPlaylists.map((playlist) => {
         if (playlist.key === selectedPlaylist.key) {
@@ -310,18 +338,7 @@ function App() {
           handleSearchChange={handleSearchChange}
         />
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            flexFlow: "row-wrap",
-            width: "70%",
-            float: "right",
-            margin: "0 50px",
-            flexWrap: "wrap",
-          }}
-        >
+        <div style={scrollDiv}>
           {showingTracks.map((track, index) => (
             <Track
               track={track}
@@ -349,7 +366,17 @@ function App() {
             <></>
           )}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", width: "20%" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "20%",
+            height: "85vh",
+            overflowY: "auto",
+            borderRight: "1px solid black",
+            boxShadow: "5px 0px 2px black",
+          }}
+        >
           {isCreating ? (
             <CreateAPlaylist
               isCreating={toggleCreating}

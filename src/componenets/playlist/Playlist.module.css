@@ -5,12 +5,17 @@
     width: max-content;
     padding: 10px 16px;
     margin: 10px auto;
+    background-color: #fab3a9;
 }
 
 .button {
     width: 30%;
     text-align: center;
     margin: 0 auto;
+    background-color: #fab3a9;
+    border-radius: 10px;
+    border: none;
+    box-shadow: #463239 0 2px 2px;
 }
 
 .playlist {
@@ -23,3 +28,17 @@
     padding: 10px;
     cursor: pointer;
 }
+
+/* button {
+    background-color: #fab3a9;
+    border-radius: 10px;
+    border: none;
+    box-shadow: #463239 0 2px 2px;
+  } */
+  
+  .button:hover {
+    cursor: pointer;
+    transform: scale(1.1) translateY(-2px);
+    background-color: #eeada4;
+  }
+  
