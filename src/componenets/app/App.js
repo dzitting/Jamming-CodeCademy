@@ -41,6 +41,20 @@ function App() {
     textAlign: "center",
   };
 
+  const scrollDiv = {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flexFlow: "row-wrap",
+    width: "70%",
+    float: "right",
+    margin: "0 50px",
+    flexWrap: "wrap",
+    maxHeight: "85vh",
+    overflowY: "auto",
+    overflowX: "hidden",
+  };
+
   //
   //29 - 55 Is used for searching and returning search query results
   //
@@ -324,18 +338,7 @@ function App() {
           handleSearchChange={handleSearchChange}
         />
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            flexFlow: "row-wrap",
-            width: "70%",
-            float: "right",
-            margin: "0 50px",
-            flexWrap: "wrap",
-          }}
-        >
+        <div style={scrollDiv}>
           {showingTracks.map((track, index) => (
             <Track
               track={track}
@@ -363,7 +366,17 @@ function App() {
             <></>
           )}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", width: "20%" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "20%",
+            height: "85vh",
+            overflowY: "auto",
+            borderRight: "1px solid black",
+            boxShadow: "5px 0px 2px black",
+          }}
+        >
           {isCreating ? (
             <CreateAPlaylist
               isCreating={toggleCreating}
